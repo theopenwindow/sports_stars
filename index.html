@@ -1,0 +1,226 @@
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Sports Starts Comparison</title>
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+		
+
+		<style type="text/css">
+			body {
+				background-color: white;
+			}
+
+			h1 {
+				font-size: 30px;
+				text-align: center;
+				margin-top: 30px;
+			}
+
+			.link {
+				margin-left: 50%;
+			}
+
+			.btn {
+			  background: #3498db;
+			  background-image: -webkit-linear-gradient(top, #3498db, #2980b9);
+			  background-image: -moz-linear-gradient(top, #3498db, #2980b9);
+			  background-image: -ms-linear-gradient(top, #3498db, #2980b9);
+			  background-image: -o-linear-gradient(top, #3498db, #2980b9);
+			  background-image: linear-gradient(to bottom, #3498db, #2980b9);
+			  -webkit-border-radius: 10;
+			  -moz-border-radius: 10;
+			  border-radius: 10px;
+			  text-shadow: 1px 1px 3px #666666;
+			  font-family: Arial;
+			  color: #ffffff;
+			  font-size: 15px;
+			  padding: 5px 15px;
+			  text-decoration: none;
+			}
+
+			.btn:hover {
+			  background: #3cb0fd;
+			  background-image: -webkit-linear-gradient(top, #3cb0fd, #3498db);
+			  background-image: -moz-linear-gradient(top, #3cb0fd, #3498db);
+			  background-image: -ms-linear-gradient(top, #3cb0fd, #3498db);
+			  background-image: -o-linear-gradient(top, #3cb0fd, #3498db);
+			  background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
+			  text-decoration: none;
+			}
+
+			p {
+
+			}
+
+			.line_chart {
+				align-self: center;
+			}
+
+			path.line {
+				fill:none;
+				stroke: black;
+				stoke-width: 2px;
+			}
+
+			.axis path,
+			.axis line {
+				fill: none;
+				stoke: white;
+				stoke-width: 1px;
+			}
+			.axis text {
+
+			}
+		</style>
+	</head>
+	<body>
+
+		<h1>2015，我们对他们的关注一直在变</h1>
+
+		<div class="link">
+		<a href="China.html" class="btn">中国体将</a>
+		<a href="NBA.html" class="btn">NBA球星</a>
+		</div>
+
+		<div class="line_chart"></div>
+
+
+		<script type="text/javascript">
+			var width = 1000;
+			var height = 1200;
+			var margin = {top:100, right:80, bottom: 100, left:80};
+
+		
+
+			var dateFormat = d3.time.format("%Y%B")
+
+			var xScale = d3.time.scale()
+							.range([margin.left, width - margin.right - margin.left]);
+			var yScale = d3.scale.linear()
+							.range([margin.top, height - margin.bottom]);
+
+			var xAxis = d3.svg.axis()
+							.scale(xScale)
+							.orient("bottom")
+							.ticks(7)
+							.tickFormat(function(d){
+								return dateFormat(d);
+							})
+							.outerTickSize([0]);
+
+			var yAxis = d3.svg.axis()
+							.scale(yScale)
+							.orient("left")
+							.outerTickSize([0])
+							.tickFormat(d3.format("s"));
+
+			var line = d3.svg.line()
+							.x(function(d){
+								return xScale(dateFormat.parse(d.month));
+							})
+							.y(function(d){
+								return yScale(+ d.amount)
+							});
+
+			var svg = d3.select(".line_chart")
+						.append("svg")
+						.attr("width", width)
+						.attr("height", height);
+
+			var colorScale = d3.scale.ordinal().range(['#AB0000', '#177DBC', '#000000', '#FFFFFF']);
+
+			d3.csv("Data/read.csv", function(data){
+				var months = ["2015January", "2015February", "2015March", "2015April", "2015May", "2015June", "2015July", "2015August", "2015September", "2015October", "2015November", "2015December", "2016January"];
+				var dataset = [];
+				data.forEach(function(d,i){
+					var myReads = [];
+					months.forEach(function(y){
+						if(d[y]){
+							myReads.push({
+								month: y,
+								amount: d[y]
+							}); 
+						}
+					}); 
+					dataset.push({
+						name:d.starName,
+						reads: myReads
+					});
+				}); 
+
+				console.log(data);
+				console.log(dataset);
+
+
+				colorScale.domain(
+					d3.extent(dataset, function(d){
+					return d.name;
+					})
+					);
+
+				function getColor(d){
+					if(dataset){
+						return colorScale(d.name);
+					}
+				};
+
+				xScale.domain(
+					d3.extent(months, function(d){
+						return dateFormat.parse(d);
+					})
+					);
+
+				yScale.domain([
+					d3.max(dataset, function(d){
+						return d3.max(d.reads, function(d){
+							return +d.amount;
+						});
+					}),
+					0
+					]);
+
+				var groups = svg.selectAll("g")
+								.data(dataset)
+								.enter()
+								.append("g");
+
+				groups.append("title")
+						.text(function(d){
+							return d.name;
+						});
+
+				groups.selectAll("path")
+						.data(function(d){
+							return [d.reads];
+						})
+						.enter()
+						.append("path")
+						.attr("class", "line")
+						.attr("d", line)
+						.style("stroke", function(d,i){
+							return getColor(d);
+						});
+
+				svg.append("g")
+					.attr("class", "x axis")
+					.attr("transform", "translate(0, "+(height - margin.bottom) + ")")
+					.call(xAxis);
+
+				svg.append("g")
+					.attr("class", "y axis")
+					.attr("transform", "translate("+margin.left + ",0)")
+					.call(yAxis);
+
+				groups.append("text")
+					  .attr("transform", function(d){
+					  	console.log(dateFormat.parse(d.reads[12].month));
+					  	return "translate("+(xScale(dateFormat.parse(d.reads[12].month))+10)+ "," +yScale(d.reads[12].amount) +")";
+					  })
+					  .text(function(d){
+					  	return d.name;
+					  });
+
+			});
+		</script>
+	</body>
+</html>

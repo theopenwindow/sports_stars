@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Key Comparison between Sports Stars</title>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+	<style>
+		.container {
+			margin-bottom: 50px;
+		}
+
+		h1 {
+			font-size: 30px;
+			margin: 50px;
+		}
+
+		.btn {
+			  background: #3498db;
+			  background-image: -webkit-linear-gradient(top, #3498db, #2980b9);
+			  background-image: -moz-linear-gradient(top, #3498db, #2980b9);
+			  background-image: -ms-linear-gradient(top, #3498db, #2980b9);
+			  background-image: -o-linear-gradient(top, #3498db, #2980b9);
+			  background-image: linear-gradient(to bottom, #3498db, #2980b9);
+			  -webkit-border-radius: 10;
+			  -moz-border-radius: 10;
+			  border-radius: 5px;
+			  text-shadow: 1px 1px 3px #666666;
+			  font-family: Arial;
+			  color: #ffffff;
+			  font-size: 15px;
+			  padding: 5px 15px 2px 15px;
+			  text-decoration: none;
+			  margin-left: 5px;
+			}
+
+		.btn:hover {
+			  background: #3cb0fd;
+			  background-image: -webkit-linear-gradient(top, #3cb0fd, #3498db);
+			  background-image: -moz-linear-gradient(top, #3cb0fd, #3498db);
+			  background-image: -ms-linear-gradient(top, #3cb0fd, #3498db);
+			  background-image: -o-linear-gradient(top, #3cb0fd, #3498db);
+			  background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
+			  text-decoration: none;
+			}
+
+		.axis path{
+			stroke: black;
+			stroke-width: 0.2px;
+			shape-rendering: crispEdges;
+		}
+
+		.axis text {
+			font-family: sans-serif;
+			font-size: 12px;
+		}
+
+		#NBA {
+    margin: auto;
+    width: 15%;
+
+		}
+
+	</style>
+</head>
+<body>
+<div class="container">
+	<h1><font color="#177DBC">宁泽涛</font> V.S. <font color="#AB0000">刘翔</font>，2015与他们最相关的<button class="btn" id="data_word">词条</button><button class="btn" id="data_person">人物</button><button class="btn" id="data_text">汉字</button> 是……</h1>
+<!-- 	<input id="num" value=10 size=2></input>
+ -->
+
+
+ 	<div id = "bar_Chart"></div>
+ 	<div id="NBA">
+ 		<a href="NBA.html" class="btn">科比 V.S. 库里？</a>
+ 	</div>
+
+ 	<script type="text/javascript">
+ 		var data_word = [
+ 		 			{word: "离婚", read: 38040511},
+ 		 			{word: "骗婚", read: 26943188},
+ 		 			{word: "明星", read: 23932519},
+ 		 			{word: "田径", read: 22685822},
+ 		 			{word: "裤裆", read: 17854565},
+ 		 			{word: "性格不合", read: 16310915},
+ 		 			{word: "假孕", read: 15867595},
+ 		 			{word: "前妻", read: 15292058},
+ 		 			{word: "内幕", read: 14131400},
+ 		 			{word: "飞人", read: 14010723}
+ 		 		];
+
+ 		var data_word_Ning = [
+ 		 			{word: "自由泳", read: 20585600},
+ 		 			{word: "鲜肉", read: 12191118},
+ 		 			{word: "喀山", read: 9005397},
+ 		 			{word: "世锦赛", read: 7841342},
+ 		 			{word: "春晚", read: 7462870},
+ 		 			{word: "女友", read: 5981120},
+ 		 			{word: "游泳", read: 5063062},
+ 		 			{word: "夺金", read: 4431792},
+ 		 			{word: "体坛", read: 4332680},
+ 		 			{word: "中国游泳队", read: 4305554}
+ 		 		];
+
+ 		 var data_person = [
+ 		 			{word: "葛天", read: 83985042},
+ 		 			{word: "吴莎", read: 21477767},
+ 		 			{word: "姚明", read: 13767456},
+ 		 			{word: "冬日娜", read: 13137822},
+ 		 			{word: "苏炳添", read: 12838175},
+ 		 			{word: "宁泽涛", read: 9769251},
+ 		 			{word: "范冰冰", read: 7876031},
+ 		 			{word: "张梓琳", read: 7756933},
+ 		 			{word: "赵本山", read: 6959061},
+ 		 			{word: "李娜", read: 6175089}
+ 		 		];
+
+ 		 var data_person_Ning = [
+ 		 			{word: "蒋欣", read: 7661481},
+ 		 			{word: "孙杨", read: 7472873},
+ 		 			{word: "吴亦凡", read: 6085862},
+ 		 			{word: "陈伟霆", read: 5594263},
+ 		 			{word: "张继科", read: 4359268},
+ 		 			{word: "孙妍在", read: 4204099},
+ 		 			{word: "刘翔", read: 4169631},
+ 		 			{word: "李易峰", read: 3598134},
+ 		 			{word: "胡歌", read: 3019753},
+ 		 			{word: "叶祖新", read: 2750703}
+ 		 		];
+
+
+ 		 var width = 1000;
+ 		 var height = 1100;
+
+    	var svg = d3.select("#bar_Chart")
+      				.append("svg")
+      				.attr("width", width + 80)
+ 		 			.attr("height", height);
+       
+        var bar_Chart1 = svg.append("g").attr("class", "bar1");
+ 		 
+ 		 bar_Chart1.append("rect")
+            	  .attr("width", "100%")
+            	  .attr("height", "100%")
+ 		 		  .attr("fill", "none");
+    
+        var bar_Chart2 = svg.append("g").attr("class", "bar2");
+ 		 
+ 		 bar_Chart2.append("rect")
+            	  .attr("width", "100%")
+            	  .attr("height", "100%")
+ 		 		  .attr("fill", "none");
+
+ 		 d3.select("#data_word")
+ 		 	.on("click", function(d,i){
+ 		 		redraw(data_word);
+ 		 		redraw_left(data_word_Ning);
+ 		 	});
+
+ 		 d3.select("#data_person")
+ 		 	.on("click", function(d,i){
+ 		 		redraw(data_person);
+ 		 		redraw_left(data_person_Ning);
+ 		 	});
+
+
+
+ 		 redraw_left(data_word_Ning);
+
+ 		 redraw(data_word);		 
+
+ 		 function redraw(data){
+ 		 	var max = d3.max(data, function(d){
+ 		 		// console.log(d.read);
+ 		 		return +d.read;
+ 		 	});
+
+ 		 	xScale = d3.scale.linear()
+ 		 				.domain([0, max])
+ 		 				.range([0, width/3]);
+
+ 		 	yScale = d3.scale.ordinal()
+ 		 				.domain(d3.range(data.length))
+ 		 				.rangeBands([0, height], .5);
+
+ 		 	var xAxis = d3.svg.axis()
+ 		 					  .scale(xScale)
+ 		 					  .orient("top")
+ 		 					  .tickFormat(d3.format(".2s"))
+ 		 					  .outerTickSize([0])
+ 		 					  .ticks(4);
+
+
+ 		 	svg.append("g")
+ 		 	   .attr("class", "axis")
+ 		 	   .attr("transform", "translate(" + (width/2+5) + "," + 50 + ")")
+ 		 	   .call(xAxis);
+
+   			svg.select(".axis").transition().duration(1000).call(xAxis);
+
+
+
+
+ 		 	var bars = bar_Chart1.selectAll("rect.bar")
+ 		 						.data(data);
+
+
+ 		 	bars.enter()
+ 		 		.append("rect")
+ 		 		.attr("class", "bar")
+ 		 		.attr("fill", "#AB0000");
+
+ 		 	bars.exit()
+ 		 		.transition()
+ 		 		.duration(300)
+ 		 		.ease("exp")
+ 		 		.attr("width", 0)
+ 		 		.remove();
+
+ 		 	bars.transition()
+ 		 		.duration(300)
+ 		 		.ease("quad")
+ 		 		.attr("width", function(d) {
+ 		 			return xScale(+d.read);
+ 		 		})
+ 		 		.attr("height", yScale.rangeBand())
+ 		 		.attr("transform", function(d,i){
+ 		 			return "translate("+[(width/2+5), yScale(i)] +")"
+ 		 		});
+
+//set the labels:
+ 		 	var labels = bar_Chart1.selectAll("text")
+								  .data(data);
+
+			labels.enter()
+				  .append("text");
+
+			labels.exit()
+				.transition()
+				.duration(300)
+				.attr("opacity", 0)
+ 		 		.remove();
+
+ 		 	labels.transition()
+ 		 		  .duration(300)
+ 		 		  .attr("transform", function(d,i){
+					  	return "translate("+(xScale(+d.read)+(width/2 + 30))+ "," + (yScale(i)+30) +")";
+					  })
+				  .text(function(d){
+					  	return d.word;
+					  });
+
+
+ 		 };
+
+
+ 		function redraw_left(data){
+ 		 	var max = d3.max(data, function(d){
+ 		 		// console.log(d.read);
+ 		 		return +d.read;
+ 		 	});
+
+ 		 	xScale = d3.scale.linear()
+ 		 				.domain([0, max])
+ 		 				.range([0, width/3]);
+
+ 		 	yScale = d3.scale.ordinal()
+ 		 				.domain(d3.range(data.length))
+ 		 				.rangeBands([0, height], .5);
+
+
+
+ 		 	var bars = bar_Chart2.selectAll("rect.bar")
+ 		 						.data(data);
+
+ 		 	bars.enter()
+ 		 		.append("rect")
+ 		 		.attr("class", "bar")
+ 		 		.attr("fill", "#177DBC");
+
+ 		 	bars.exit()
+ 		 		.transition()
+ 		 		.duration(300)
+ 		 		.ease("exp")
+ 		 		.attr("width", 0)
+ 		 		.remove();
+
+ 		 	bars.transition()
+ 		 		.duration(300)
+ 		 		.ease("quad")
+ 		 		.attr("width", function(d) {
+ 		 			return xScale(+d.read);
+ 		 		})
+ 		 		.attr("height", yScale.rangeBand())
+ 		 		.attr("transform", function(d,i){
+ 		 			return "translate("+[(width/2-xScale(+d.read)-5), yScale(i)] +")"
+ 		 		});
+
+//set the labels:
+ 		 	var labels = bar_Chart2.selectAll("text")
+								  .data(data);
+
+			labels.enter()
+				  .append("text");
+
+			labels.exit()
+				.transition()
+				.duration(300)
+				.attr("opacity", 0)
+ 		 		.remove();
+
+ 		 	labels.transition()
+ 		 		  .duration(300)
+ 		 		  .attr("transform", function(d,i){
+					  	return "translate("+(width/2-xScale(+d.read)-85)+ "," + (yScale(i)+30) +")";
+					  })
+				  .text(function(d){
+					  	return d.word;
+					  });
+
+ 		 };
+
+
+
+ 		
+ 	</script>
+</div>
+</body>
+</html>
